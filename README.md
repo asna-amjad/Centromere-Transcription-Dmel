@@ -16,6 +16,4 @@ Each code block is uploaded as a basic set of commands, and was run on the Unive
 
 This block was modified for memory and performance requirements accordingly.
 
-Meryl-associated code and unique kmer: https://github.com/bmellone/Dmel-Centromere-Transcription/tree/main/Unique_Kmers
-
 Drosophila heterochromatin assembly (Chang et al. PLoS Bio, 2019 DOI:https://doi.org/10.1371/journal.pbio.3000241) doi:10.5061/dryad.rb1bt3j/File.S8.Chang_et_al.fasta Drosophila heterochromatin repeat annotations (Chang et al. PLoS Bio, 2019 DOI:https://doi.org/10.1371/journal.pbio.3000241) doi:10.5061/dryad.rb1bt3j/File.S9.Chang_et_al.gff.txt
