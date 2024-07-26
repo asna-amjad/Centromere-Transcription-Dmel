@@ -1,0 +1,48 @@
+####Unique kmer filtering pipeline####
+###The following steps were applied to the PROseq mapped data
+
+bedtools bamtobed -i PROseq_Trim_RevComp_R1_bt2-k100-Dmel_sort.bam > PROseq_Trim_RevComp_SE_bt2-k100-Dmel.bed
+
+### Step 1: Get 3' ends (position of polymerase) & convert to bedgraph
+################################################################################
+cat PROseq_Trim_RevComp_SE_bt2-k100-Dmel.bed |
+awk '{OFS="\t"} $6=="+" {print $1,($3-1),$3,$4,$5"_"($3-$2),$6}; $6=="-" {print $1,$2,($2+1),$4,$5"_"($3-$2),$6}' |
+       sort --parallel 12 -k1,1 -k2,2n > PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends.bed
+
+##Convert to bedgraph:
+awk '$6 == "+"' PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends.bed | genomeCoverageBed -3 -i /dev/stdin -bg -g contigs.size > \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends_plus.bedgraph
+awk '$6 == "-"' PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends.bed | genomeCoverageBed -3 -i /dev/stdin -bg -g contigs.size > \
+       PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends_m.bedgraph
+awk '{OFS="\t"}{ $4=$4*-1; print }' PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends_m.bedgraph > PROseq_Trim_RevComp_SE_bt2-k100-Dmel_3ends_minus.bedgraph
+
+##################################################################################################
+### Step 2: OverlapSelect read pairs with unique kmers, get 3' end per pair, & convert to bedgraph
+###################################################################################################
+overlapSelect -overlapBases=21 Meryl1.4.1Kmers/dmel_scaffold2_plus0310_21mer_SINGLEv1.4.1.meryl_merge.bed \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel.bed \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged.bed 
+
+##Get single-bp coords (start of R1):
+cat PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged.bed |
+       awk '{OFS="\t"} $6=="+" {print $1,($3-1),$3,$4,$5"_"($3-$2),$6}; $6=="-" {print $1,$2,($2+1),$4,$5"_"($3-$2),$6}' |
+       sort --parallel 12 -k1,1 -k2,2n > PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends.bed
+
+##Convert to bedgraph:
+awk '$6 == "+"' PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends.bed | genomeCoverageBed -3 -i /dev/stdin -bg -g contigs.size > \
+       PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_plus.bedgraph
+awk '$6 == "-"' PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends.bed | genomeCoverageBed -3 -i /dev/stdin -bg -g contigs.size > \
+       PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_m.bed
+awk '{OFS="\t"}{ $4=$4*-1; print }' PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_m.bedgraph > \
+       PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_minus.bedgraph
+############### PROseq SE K-100 21-mer Filtered ###############
+export LC_COLLATE=C
+sort -k1,1 -k2,2n PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_plus.bedgraph > \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_plus_sort.bedgraph    
+sort -k1,1 -k2,2n PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_minus.bedgraph > \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_minus_sort.bedgraph
+
+bedGraphToBigWig PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_plus_sort.bedgraph contigs.size \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_plus.bigwig
+bedGraphToBigWig PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_minus_sort.bedgraph contigs.size \
+        PROseq_Trim_RevComp_SE_bt2-k100-Dmel.over.FullAsm.21mer.single.meryl.merged_3ends_minus.bigwig
