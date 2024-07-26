@@ -47,3 +47,12 @@ bedGraphToBigWig Iso1_CIDAM-CENPA-AllReads_bt2-Dmel_PairsOnly_NameSort_Dmel.frag
 #########################################################
 mkdir macs
 macs2 callpeak -t Iso1_CIDAM-CENPA-AllReads_bt2-Dmel_PairsOnly_NameSort_Dmel.bam -c CnT_IgG-bt2_PairsOnly_NameSort.bam -f BAMPE -g dm -q 0.01 -B --callsummits
+
+################### Peak Calling using SEACR ############
+bash /labs/Mellone/Asna/CutTag_DeepSeeq/trimmed/Mapping/bam/Coverage/SEACR_1.3.sh \
+       Iso1_CIDAM-CENPA-AllReads_bt2-Dmel_PairsOnly_NameSort_Dmel.frag.pe.sort.bedgraph CnT_IgG_bt2-Dmel_PairsOnly_NameSort_dmel.frag.pe.sort.bedgraph norm stringent \
+       NewPeak/Iso1_CIDAM-CENPA-AllReads_bt2-Dmel_PairsOnly_NameSort_Dmel.frag.pe.CenpA-IgG_Norm-stringent_SEACR
+
+bash /labs/Mellone/Asna/CutTag_DeepSeeq/trimmed/Mapping/bam/Coverage/SEACR_1.3.sh \
+       Iso1_CIDAM-CENPA-AllReads_bt2-Dmel_PairsOnly_NameSort_Dmel.frag.pe.sort.bedgraph 0.01 norm stringent \
+       Iso1_CIDAM-CENPA-AllReads_bt2-Dmel_PairsOnly_NameSort_Dmel.frag.pe_0.01_perc_SEACR
