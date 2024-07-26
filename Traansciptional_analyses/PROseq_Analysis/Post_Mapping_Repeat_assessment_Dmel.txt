@@ -1,0 +1,71 @@
+**The following steps were applied for generation of a master bed file with data features per repeat**
+
+_Define variables_
+```
+OUTpath=/path/to/output/directory/
+INfileprefix=SAMPLE
+DrosMelContigLengths=/genomeData/DrosMel_lengths.genome
+```
+_Modification of input files_
+
+1) Add "CEN" to last column of centromeric-contig file
+``` 
+awk 'NF=NF+1{$NF="CEN"}1' FS="\t" OFS="\t" ${OUTpath}DrosMel_CENcontigs.bed > ${OUTpath}DrosMel_CENcontigs_edit.bed
+```
+RESULT:
+    `Y_Contig71  1   [length_of_contig]  CEN`
+
+_Build master bed file across all repeats_
+
+2) Get read count coverage over repeat annotations (requiring at least 50% overlap) --> what are the transcription profiles per repeat?
+```
+bedtools coverage -counts -F 0.5 -sorted -a ${OUTpath}DrosMel_repeat-annotations.bed -g ${HumanGenomeLengths} -b ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel.bed > ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations.bed
+```
+RESULT: a new column (counts; from -b) is appended onto the repeat file (-a) as a final column (note: the header here is not part of the file)
+
+```
+| chr | start | end | repeat_class | repeat_subfam | counts |
+| 1   | 1000  | 5000| LTR          | Gypsy_I-int   | 10435  |
+| 2   | 2000  | 2400| DNA          | ProTop_B      | 13245  |
+```
+
+
+3) Print 4th column ("CEN") of centromeric-designation file --> which repeats fall in the centromere?
+```
+bedtools map -c 4 -o collapse -a ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations.bed -g ${HumanGenomeLengths} -b ${OUTpath}DrosMel_CENregions_edit.bed > ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations_CEN.bed
+```
+
+RESULT: a new column (CEN; from -b) is appended onto the repeat file (-a) as a final column IF the two overlap; if there is NO overlap then a "." is printed. (Note: the header here is not part of the file.)
+```
+| chr | start | end | repeat_class | repeat_subfam | counts | cen_contig |
+| 1   | 1000  | 5000| LTR          | Gypsy_I-int   | 10435  | CEN        |
+| 2   | 2000  | 2400| DNA          | ProTop_B      | 13245  | .          |
+```
+
+**The following steps were applied for quantification of reads overlapping each repeat per group**
+
+Three groups were assessed for repeat transcription: 
+
+- genome-wide (global)
+- centromeric (regional)
+- non-centromeric (regional)
+
+_Modification of input files_
+
+4) Separate master bed file into a centromeric one and a non-centromeric one based on the labels added in step 3 above
+```
+This represents the global file: ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations_CEN.bed
+grep "CEN" ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations_CEN.bed > ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations_CEN_ONLY.bed
+grep -v "CEN" ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations_CEN.bed > ${OUTpath}${INfileprefix}_trimmed_RC_mapped2DrosMel_COV_DrosMel_repeat-annotations_CEN_NOT.bed
+```
+5) Assessment of transcriptional activity in two ways:
+
+    A) number of READS overlapping each repeat --> how transcriptonally active is that repeat?
+            `Summarize_ReadCounts_perRepeatClass.sh`
+
+    B) number of REPEATS with overlapping reads --> which/how many repeats are transcriptionally active?
+            `Summarize_RepeatClassCounts_WithReads.sh`
+
+Each of these methods involve the use of a master bed file (above) as the input into one of two summarization scripts provided in this directory. 
+The scripts are written for quantification for the repeat classes found in human, but can be edited to include additional classes, remove exisiting ones, only quantify classes of interest, or to change the classes to a lower classification (family/subfamily).
+As its written now, need to run Summarize_ReadCounts_perRepeatClass.sh first to generate repeat class files. Both scripts will output the quantification summaries in a .out file. 
