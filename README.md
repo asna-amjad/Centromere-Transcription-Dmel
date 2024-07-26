@@ -1,6 +1,6 @@
 # Centromere-Transcription-Dmel
 
-This repository is for all analyses related to Drosophila melanogaster centromere transcription datasets (PROseq, RNAseq, and CUT&Tag). All analyses are mainly done on the University of Connecticut HPC cluster under SLURM software.
+This repository is for all the analyses related to my project of exploring centromere transcription in Drosophila melanogaster datasets (PROseq, RNAseq, and CUT&Tag). All analyses are mainly done on the University of Connecticut HPC cluster under SLURM software.
 
 Each code block is uploaded as a basic set of commands, and was run on the University of Connecticut HPC cluster under the SLURM management software. This code block is included here: 
 #!/bin/bash 
