@@ -1,4 +1,4 @@
-## RNA-seq Pipeline to Map with BT2 Df, BT2 k100, and BT2 k100 (51mer Filetered) for 0-12h embryos ###
+### RNA-seq Pipeline to Map with BT2 Df, BT2 k100, and BT2 k100 (51mer Filetered) for 0-12h embryos ###
 ### Same pipeline used to map RNA-seq brains data ###
 ######################################################################################################
 
@@ -84,7 +84,7 @@ bowtie --threads 24 -k 100 --sam -q -x Bt1_Index/dmel_het_assembly.fasta \
 bedtools bamtobed -i PROseq_Trim_R1_RC_HumanFilt_BT-k100-DM_sort.bam > PROseq_Trim_R1_RC_HumanFilt_BT-k100-DM.bed
 sort -k1,1 -k2,2n PROseq_Trim_R1_RC_HumanFilt_BT-k100-DM.bed > PROseq_Trim_R1_RC_HumanFilt_BT-k100-DM_sort.bed
 
-create 3'-end BEDs (FOR KMER OVERLAPS & getting counts - add to directory)
+#create 3'-end BEDs (FOR KMER OVERLAPS & getting counts - add to directory)
 awk '{OFS="\t"} ($6=="+") {print $1,($3-1),$3,".",($3-$2),$6}; ($6=="-") {print $1,$2,($2+1),".",($3-$2),$6}' PROseq_Trim_R1_RC_HumanFilt_BT-k100-DM_sort.bed |
         sort -k1,1 -k2,2n > PROseq_Trim_R1_RC_HumanFilt_BT-k100-DM_sort_3prime.bed
 
