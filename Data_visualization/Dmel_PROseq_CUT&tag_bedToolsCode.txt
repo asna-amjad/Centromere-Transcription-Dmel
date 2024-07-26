@@ -1,0 +1,62 @@
+## Done by Savannah Hoyt
+## Drosophila melaongaster PRO-seq and CUT&Tag post-alignment code for statistical analyses ##
+
+### De-dup (removal of duplicate) PRO-seq reads ###
+```
+module load picard/2.9.2
+echo -e "Marking duplicates"
+java -jar /isg/shared/apps/picard/picard-tools-2.9.2/picard.jar MarkDuplicates \
+TAGGING_POLICY=All \
+REMOVE_DUPLICATES=false \
+OPTICAL_DUPLICATE_PIXEL_DISTANCE=100 \
+I=PROseq_Emb_BT2_Df_Dmel_sort.bam
+O=PROseq_Emb_BT2_Df_Dmel_markDups.bam
+M=PROseq_Emb_BT2_Df_Dmel_markDups.txt
+echo -e "Finished marking duplicates"
+echo -e "Generating bam file without duplicate reads"
+samtools view -bhF 0x400 -@ 12 PROseq_Emb_BT2_Df_Dmel_markDups.bam > PROseq_Emb_BT2_Df_Dmel_noDupReads.bam
+echo -e "Generating bam file containing only duplicate reads"
+samtools view -bhf 0x400 -@ 12 PROseq_Emb_BT2_Df_Dmel_markDups.bam > PROseq_Emb_BT2_Df_Dmel_dupReadsOnly.bam
+```
+- Following the above code, proceeded into retrival of concordant pairs and then generation of 3' end PRO-seq bed (for below) and bigwig files (for tracks). 
+
+### Label Jockey-3 copies with CENP-A and CEN designations ###
+```
+bedtools map -c 4 -o collapse -a Jockey3_Dmel.bed -g contigs_sort.size -b CENPA-domains_CEN-nonCEN_Dmel.bed > Jockey3_Dmel_CENPA-domains_CEN-nonCEN_Dmel.bed
+```
+- Wherein, column (-c) 4 is CENP-A/CEN designation (CENP-A-CEN, CENP-A-nonCEN, or nonCENP-A).
+- Results reported in Table 1 and Table S1, and summarized in Table S6.
+
+### Jockey-3 coverage per CENP-A domain ###
+```
+bedtools coverage -a CENPA-domains_CEN-nonCEN_Dmel.bed -g contigs_sort.size -b Jockey3_Dmel.bed > CENPA-domains_CEN-nonCEN_Dmel_COV_Jockey3_Dmel.bed
+```
+- Results reported in Table 3.
+
+### Average signal intensity per CENP-A domain ###
+```
+bedtools map -c 7 -o mean -a CENPA-domains_CEN-nonCEN_Dmel.bed -g contigs_sort.size -b CUTnTag_peaks.narrowPeak.bed > CUTnTag_peaks.narrowPeak_AVG_CENPA-domains_CEN-nonCEN_Dmel.bed
+```
+- Wherein, column (-c) 7 is CENP-A Signal Intensity.
+- Results reported in Table S4.
+
+### PRO-seq reads per Jockey-3 ###
+```
+bedtools coverage -counts -sorted -a Jockey3_Dmel.bed -g contigs_sort.size -b PROseq_3ends.bed > Jockey3_Dmel_COVcounts_PROseq_3ends.bed
+```
+- Applied to all three mapping methods: Bowtie 2 default "best match" (de-duplicated), Bowtie k-100, Bowtie k-100 21-mer filtered.
+- Results reported in Table S1 and summarized in Table S5.
+
+### PRO-seq reads per CENP-A domain ###
+```
+bedtools coverage -counts -sorted -a CENPA-domains_CEN-nonCEN_Dmel.bed -g contigs_sort.size -b PROseq_3ends.bed > CENPA-domains_CEN-nonCEN_Dmel_COVcounts_PROseq_3ends.bed
+```
+- Only applied to Bowtie 2 default "best match" (de-duplicated).
+- Results reported in Table S4.
+
+### Unique 21-mer coverage per Jockey-3 ###
+```
+bedtools coverage -a Jockey3_Dmel.bed -g contigs_sort.size -b Meryl-21mer-SINGLEv1.3_Dmel.bed > Jockey3_Dmel_COV_Meryl-21mer-SINGLEv1.3_Dmel.bed
+```
+- Results reported in Table S1.
+
