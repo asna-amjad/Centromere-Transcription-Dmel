@@ -1,0 +1,20 @@
+## Code to generate heatmaps Fig 1C
+
+########### With Density ##############
+filK100<-read.table("ReadCount_ProSeq_K100Filtered_New.txt",header=T)
+
+filK100$Component <- factor(filK100$Component, levels=rev(c("Jockey-3","Jockey-1_dsi","Doc2","Doc","G6_dm","G5_dm","G_dm","BS","Dmrt1B","TART_B1","R2","Copia","Gypsy6-I_Dmoj","Gypsy-2_dsim","Gypsy-24_dy","Gypsy-27_dya","Gypsy-7_dse","Nomad","NTS","rDNA.ETS","rDNA.ITS2","5.8s_rDNA","28s_rDNA","18s_rDNA","AAGAT","AAGAG","AATAG","Prodsat","Dodeca","Protop")))
+filK100$Location <- factor(filK100$Location, levels=c("Contig79","Y_Contig26",tig00057289","3R_5","Contig119"))
+filK100$Density=round(log10(filK100$Density),2)
+b<-ggplot(filK100, aes(Location,Component)) + geom_tile(aes(fill = Density))+ scale_fill_gradient(low ="white", high = "blue", labels=c("1e-6","1e-5","1e-4","1e-3","1e-2","1e-1")) + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) 
+ggsave("ProSeq_Counts_K100Filtered_Density.pdf",width = 8, height = 10,device = "pdf")
+
+########### With Counts ################
+filK100<-read.table("ReadCount_ProSeq_K100Filtered_New.txt",header=T)
+
+filK100$Component <- factor(filK100$Component, levels=rev(c("Jockey-3","Jockey-1_dsi","Doc2","Doc","G6_dm","G5_dm","G_dm","BS","Dmrt1B","TART_B1","R2","Copia","Gypsy6-I_Dmoj","Gypsy-2_dsim","Gypsy-24_dy","Gypsy-27_dya","Gypsy-7_dse","Nomad","NTS","rDNA.ETS","rDNA.ITS2","5.8s_rDNA","28s_rDNA","18s_rDNA","AAGAT","AAGAG","AATAG","Prodsat","Dodeca","Protop")))
+filK100$Location <- factor(filK100$Location, levels=c("Contig79","Y_Contig26",tig00057289","3R_5","Contig119"))
+filK100$Count=round(log10(filK100$Count),2)
+b<-ggplot(filK100, aes(Location,Component)) + geom_tile(aes(fill = Count))+ scale_fill_gradient(low ="white", high = "blue", labels=c("1e-6","1e-5","1e-4","1e-3","1e-2","1e-1")) + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) 
+ggsave("ProSeq_Counts_K100Filtered_CountsLog.pdf",width = 8, height = 10,device = "pdf")
+
