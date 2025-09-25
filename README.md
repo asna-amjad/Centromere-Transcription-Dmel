@@ -17,3 +17,8 @@ Each code block is uploaded as a basic set of commands, and was run on the Unive
 This block was modified for memory and performance requirements accordingly.
 
 Drosophila heterochromatin assembly (Chang et al. PLoS Bio, 2019 DOI:https://doi.org/10.1371/journal.pbio.3000241) doi:10.5061/dryad.rb1bt3j/File.S8.Chang_et_al.fasta Drosophila heterochromatin repeat annotations (Chang et al. PLoS Bio, 2019 DOI:https://doi.org/10.1371/journal.pbio.3000241) doi:10.5061/dryad.rb1bt3j/File.S9.Chang_et_al.gff.txt
+
+Publication:
+Chabot B.J., Sun R.*, Amjad A.*, Hoyt S.J.*, Ouyang L., Courret C., Leo L., Larracuente A.M., Core L.J., O’Neill R.J., Mellone B.G. Transcription of a centromere-enriched retroelement and local retention of its RNA are significant features of the CENP-A chromatin landscape. Genome Biol 25, 295 (2024). Link doi.org/10.1186/s13059-024-03433-1
+
+* Equal contributors
